@@ -46,23 +46,20 @@ function menu
 
 function only_app
 {   
-    verify_base 'app43_' && restore_base 'app43_' || menu
+    verify_base 'app43_' && restore_base 'app43_' && end || menu
 
-    end
 }
 
 function only_cloud
 {   
-    verify_base && restore_base || menu
+    verify_base && restore_base && end || menu
 
-    end
 }
 
 function both_bases
 {   
-    (verify_base 'app43_' && verify_base) && restore_base 'app43_'; restore_base || menu
+    verify_base 'app43_' && verify_base && restore_base 'app43_' && restore_base && end || menu
     
-    end
 }
 
 # $arg1 prefixo do nome da licença (app43_)
