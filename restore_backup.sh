@@ -141,8 +141,11 @@ function verify_base()
 
             if [[ ! $HAS_UPDATES ]]
             then
-                # mudar a url para acessar local
+                # mudar a url para acessar local quando a base tá apontada para a master
                 UPDATE="UPDATE \`APP\` SET \`ST_URL_APP\` = REPLACE(\`ST_URL_APP\`, 'https://apps.superlogica.net/', 'http://localhost/');\n"
+                sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
+                # mudar a url para acessar local quando a base está apontada para a estagio
+                UPDATE="UPDATE \`APP\` SET \`ST_URL_APP\` = REPLACE(\`ST_URL_APP\`, 'https://estagioapps.superlogica.net/', 'http://localhost/');\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
                 # liberar usuário suporte
                 UPDATE="UPDATE \`USUARIO\` SET \`FL_USUARIODESATIVADO_USU\` = 0 WHERE \`ID_USUARIO_USU\` = 999998;"
