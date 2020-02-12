@@ -148,7 +148,7 @@ function verify_base()
                 UPDATE="UPDATE \`USUARIO\` SET \`FL_USUARIODESATIVADO_USU\` = 0 WHERE \`ID_USUARIO_USU\` = 999998;\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
                 # altera a senha de todos usuários para 'local'
-                UPDATE="UPDATE \`USUARIO\` SET \`ST_AUTHTYPE_USU\` = '', \`ST_SENHA_USU\` = UPPER(MD5('local'));\n"
+                UPDATE="UPDATE \`USUARIO\` SET \`ST_AUTHTYPE_USU\` = '', \`ST_SENHA_USU\` = UPPER(MD5('local')) WHERE ID_USUARIO_USU < 999990;\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
                 # criar novo usuário
                 INSERT="INSERT INTO \`USUARIO\` (\`ID_USUARIO_USU\`, \`ST_NOME_USU\`, \`ST_SENHA_USU\`, \`ST_APELIDO_USU\`, \`FL_USUARIODESATIVADO_USU\`, \`ST_AUTHTYPE_USU\`, \`ST_APPTOKEN_USU\`, \`ID_USUARIOQUEAUTORIZOU_USU\`, \`ST_ACCESSTOKEN_USU\`, \`FL_TIPO_USU\`, \`ST_ACESSO_USU\`, \`ST_IPSLIBERADOS_USU\`, \`ST_CPF_USU\`, \`ST_CELULAR_USU\`, \`FL_SINCRONIZARMONGO_USU\`, \`DT_ULTIMOLOGIN_USU\`) VALUES ( 888888, 'local@local.com', UPPER(MD5('local')), 'Local', 0, '', '', NULL, '', NULL, NULL, NULL, NULL, NULL, 0, NULL);\n"
