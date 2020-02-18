@@ -17,9 +17,23 @@ function menu
     clear
     echo -e ""
     echo -e "|----------------------------------------------------|"
-    echo -e "|              Restaurar Backup V 1.0                |"
+    echo -e "|              Restaurar Backup V 1.1                |"
     echo -e "|----------------------------------------------------|"
     echo -e ""
+
+    name_license
+    backup_option
+}
+
+function name_license()
+{
+    echo 
+    echo -n "Digite o nome da licenca: "
+    read LICENCA
+}
+
+function backup_option()
+{
     echo "[ 1 ] Somente apps"
     echo "[ 2 ] Somente cloud"
     echo "[ 3 ] Ambos"
@@ -27,13 +41,6 @@ function menu
     echo
     echo -n "Digite a opcao desejada: "
     read OPCAO
-    
-    if [[ "$OPCAO" = "1" || "$OPCAO" = "2" || "$OPCAO" = "3" ]]
-    then
-        clear
-        echo -n "Digite o nome da licenca: "
-        read LICENCA
-    fi
 
     case $OPCAO in
         1) only_app ;;
@@ -44,25 +51,46 @@ function menu
     esac
 }
 
+function prefix_vertical()
+{
+    clear
+    echo -e "VERTICAL"
+    echo -e "--------"
+    echo "[ 1 ] Educacional"
+    echo "[ 2 ] Imobiliarias"
+    echo "[ 0 ] Voltar"
+    echo
+    echo -n "Digite a opcao da vertical desejada: "
+    read VERTICAL
+    case $VERTICAL in
+        1) PREFIXAPP="app43_" ;;
+        2) PREFIXAPP="app26_" ;;
+        0) clear; menu ;;
+        *) echo -e "Opcão desconhecida." ; sleep 2; clear; menu ;;
+    esac
+}
+
 function only_app
-{   
-    verify_base 'app43_' && restore_base 'app43_' && end || menu
+{
+    prefix_vertical
+    verify_base "$PREFIXAPP" && restore_base "$PREFIXAPP" && end || menu
 
 }
 
 function only_cloud
-{   
+{
     verify_base && restore_base && end || menu
 
 }
 
 function both_bases
-{   
-    verify_base 'app43_' && verify_base && restore_base 'app43_' && restore_base && end || menu
+{
+    prefix_vertical
+    verify_base "$PREFIXAPP" && verify_base && restore_base "$PREFIXAPP" && restore_base && end || menu
     
 }
 
-# $arg1 prefixo do nome da licença (app43_)
+# $arg1 prefixo do nome da licença
 function get_file_path
 {
     APP=$1
@@ -77,7 +105,7 @@ function get_file_path
     FILE_PATH=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
 }
 
-# $arg1 prefixo do nome da licença (app43_)
+# $arg1 prefixo do nome da licença
 function restore_base
 {
     APP=$1
@@ -91,7 +119,7 @@ function restore_base
     sleep 1
 }
 
-# $arg1 prefixo do nome da licença (app43_)
+# $arg1 prefixo do nome da licença
 # return $TRUE quando a base está pronta para ser restaurada, return $FALSE quando tem algum problema
 function verify_base()
 {   
