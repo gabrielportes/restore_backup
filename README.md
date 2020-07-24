@@ -1,5 +1,8 @@
-# Shell Script para restaurar as bases Superlógica
+# Shell Script para restaurar as bases SuperlÃ³gica
 
-- Para utilizá-lo, basta baixá-lo para alguma pasta de seu PC
-- Torná-lo executavél: chmod +x restore_backup.sh
-- Executá-lo: ./restore_backup.sh
+Como executar o script:
+- Para utilizÃ¡-lo, basta baixÃ¡-lo para alguma pasta de seu PC
+- TornÃ¡-lo executavÃ©l: chmod +x restore_backup.sh
+- ExecutÃ¡-lo: ./restore_backup.sh
+
+A base que vocÃª deseja restaurar deve estar extraÃ­da dentro do diretÃ³rio `/home/cloud-db`. Obs.: o arquivo nÃ£o pode estar compactado.
