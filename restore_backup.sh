@@ -97,12 +97,12 @@ function get_file_path
 
     if [[ $APP ]]
     then
-        FILE_PATH_APP=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
+        FILE_PATH_APP=$(find /home/cloud-db -maxdepth 1 -type f -iname "$APP$LICENCA*.sql")
     fi    
     
-    FILE_PATH_CLOUD=$(find /home/cloud-db -type f -iname "$LICENCA*.sql")
+    FILE_PATH_CLOUD=$(find /home/cloud-db -maxdepth 1 -type f -iname "$LICENCA*.sql")
 
-    FILE_PATH=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
+    FILE_PATH=$(find /home/cloud-db -maxdepth 1 -type f -iname "$APP$LICENCA*.sql")
 }
 
 # $arg1 prefixo do nome da licença
