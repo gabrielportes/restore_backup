@@ -136,24 +136,26 @@ function verify_base()
 
     if [[ $FILE_PATH ]]
     then
-        LICENCA_LOCALNAME="\`$APP$LICENCA-001\`"
-        HAS_LOCAL_NAME=$(grep "$LICENCA_LOCALNAME" $FILE_PATH)
-        LICENCA_PRODUCTIONNAME="\`$APP$LICENCA\`"
-        HAS_PRODUCTION_NAME=$(grep "$LICENCA_PRODUCTIONNAME" $FILE_PATH)
-
-        if [[ ! $HAS_LOCAL_NAME ]] # não está pronto para restaurar a base
+        echo "Preparando arquivos para restaurar..."
+        LICENCA_LOCAL_NAME="\`$APP$LICENCA-001\`"
+        USE_COMMAND_LOCAL_NAME="USE $LICENCA_LOCAL_NAME;"
+        HAS_USE_COMMAND_LOCAL_NAME=$(grep "$USE_COMMAND_LOCAL_NAME" $FILE_PATH)
+        LICENCA_PRODUCTION_NAME="\`$APP$LICENCA\`"
+        USE_COMMAND_PRODUCTION_NAME="USE $LICENCA_PRODUCTION_NAME;"
+        HAS_USE_COMMAND_PRODUCTION_NAME=$(grep "$USE_COMMAND_PRODUCTION_NAME" $FILE_PATH)
+        if [[ ! $HAS_USE_COMMAND_LOCAL_NAME ]] # não está pronto para restaurar a base
         then
-            if [[ $HAS_PRODUCTION_NAME ]] # tem o nome da licença sem o -001
+            if [[ $HAS_USE_COMMAND_PRODUCTION_NAME ]] # tem o nome da licença sem o -001
             then
-                sed -i "s/$LICENCA_PRODUCTIONNAME/$LICENCA_LOCALNAME/g" $FILE_PATH
+                sed -i "s/$LICENCA_PRODUCTION_NAME/$LICENCA_LOCAL_NAME/g" $FILE_PATH
             else # precisa dar o CREATE DATABASE e o USE
-                INPUT_TEXT="USE \`$APP$LICENCA-001\`;\n"
+                INPUT_TEXT="$USE_COMMAND_LOCAL_NAME\n"
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
-                INPUT_TEXT="CREATE DATABASE /*!32312 IF NOT EXISTS*/ \`$APP$LICENCA\-001\` /*!40100 DEFAULT CHARACTER SET latin1 */;\n"
+                INPUT_TEXT="CREATE DATABASE /*!32312 IF NOT EXISTS*/ $LICENCA_LOCAL_NAME /*!40100 DEFAULT CHARACTER SET latin1 */;\n"
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
                 INPUT_TEXT='--\n'
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
-                INPUT_TEXT="-- Current Database: \`$APP$LICENCA\-001\`"
+                INPUT_TEXT="-- Current Database: $LICENCA_LOCAL_NAME"
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
                 INPUT_TEXT='--'
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
