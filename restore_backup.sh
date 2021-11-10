@@ -11,17 +11,20 @@ declare -g LICENCA=''
 declare -g FILE_PATH=''
 declare -g FILE_PATH_APP=''
 declare -g FILE_PATH_CLOUD=''
+declare -g RESTORE_OPTION=''
+declare -g DB_ROOT='/home/cloud-db'
 
 function menu
 {
     clear
     echo -e ""
     echo -e "|----------------------------------------------------|"
-    echo -e "|              Restaurar Backup V 1.1                |"
+    echo -e "|              Restaurar Backup V 1.2                |"
     echo -e "|----------------------------------------------------|"
     echo -e ""
 
     name_license
+    select_restore_option
     backup_option
 }
 
@@ -32,8 +35,28 @@ function name_license()
     read LICENCA
 }
 
+select_restore_option()
+{
+    clear
+    echo "Buscar a licenca de:"
+    echo "[ 1 ] Local: cloud-db"
+    echo "[ 2 ] VPN: temp"
+    echo "[ 0 ] Sair"
+    echo
+    echo -n "Digite a opcao desejada: "
+    read RESTORE_OPTION
+
+    case $RESTORE_OPTION in
+        1) clear ;;
+        2) clear ;;
+        0) clear; echo -e "SAINDO DO SCRIPT..." ; sleep 2; clear; exit ;;
+        *) echo -e "Opcão desconhecida." ; sleep 2; clear; menu ;;
+    esac
+}
+
 function backup_option()
 {
+    echo "Restaurar em:"
     echo "[ 1 ] Somente apps"
     echo "[ 2 ] Somente cloud"
     echo "[ 3 ] Ambos"
@@ -94,6 +117,12 @@ function both_bases
 function get_file_path
 {
     APP=$1
+
+    if [[ $RESTORE_OPTION == "2" ]]
+    then
+        get_db_from_vpn "$APP"
+        RESTORE_OPTION=3
+    fi
 
     if [[ $APP ]]
     then
@@ -195,6 +224,84 @@ function verify_base()
     else
         return $FALSE;
     fi
+
+    return $TRUE;
+}
+
+function get_db_from_vpn
+{
+    echo "ATENCAO: Certifique-se de estar conectado a VPN."
+    echo "Aguarde... Caso necessario, forneca a senha sudo para obter a licenca da VPN."
+    sudo echo
+
+    #Temos cifs-utils instalado? 
+	CIFS=`dpkg  --get-selections cifs-utils 2>/dev/null`
+	if [[ "$CIFS" == "" ]]
+    then
+		echo "Pacote cifs-utils sera instalado..."
+		sudo apt update && sudo apt install -y cifs-utils
+	fi
+    $(sudo umount /mnt/temp)
+
+	if [[ ! -d /mnt/temp ]]
+    then
+		echo "Diretorio /mnt/temp sera criado..."
+		sudo mkdir -p /mnt/temp
+	fi
+
+    
+	MOUNTED=`df | grep /mnt/temp`
+	if [[ "$MOUNTED" == "" ]]
+    then
+		echo "Diretorio /mnt/temp sera montado..."
+        
+        VPN_DIR="filesystem.campinas.superlogica.com/temp/admin130430"
+		MOUNT_CIFS=$(sudo mount -t cifs -o username=guest,password= //$VPN_DIR /mnt/temp 2>&1)
+
+        if [[ "$MOUNT_CIFS" != "" ]]
+        then
+            echo "VPN nao esta conectada, tente novamente apos conectar..."
+            sleep 3
+            exit
+        fi
+	fi
+
+    APP=$1
+    if [[ $APP ]]
+    then
+        echo "Copiando $APP$LICENCA para /home/cloud-db..."
+        DB_PATH=`find /mnt/temp/ -iname $APP$LICENCA*gz`
+        BASEN=$(echo "DB_PATH" | wc -l)
+        if [[ "$DB_PATH" == "" ]]
+        then
+		    echo "Base $database nao localizada na VPN! Verifique..."
+		    exit
+	    fi
+        cp $DB_PATH $DB_ROOT
+
+        echo "Base copiada, agora extraindo..."
+        cd $DB_ROOT
+        gunzip $APP$LICENCA*.gz
+
+        # caso tenha sido only apps
+        if [[ "$OPCAO" == "1" ]]
+        then
+            return $TRUE;
+        fi
+    fi
+
+    echo "Copiando $LICENCA para /home/cloud-db"
+    DB_PATH=`find /mnt/temp/ -iname $LICENCA*gz`
+    BASEN=$(echo "DB_PATH" | wc -l)
+	if [[ "$DB_PATH" == "" ]]
+    then
+		echo "Base $database nao localizada na VPN! Verifique..."
+        exit
+	fi
+    cp $DB_PATH $DB_ROOT
+    echo "Base copiada, agora extraindo..."
+    cd $DB_ROOT
+    gunzip $LICENCA*.gz
 
     return $TRUE;
 }
