@@ -1,8 +1,8 @@
 #!/bin/bash
 #------------------------------------------------------------------
-# Autor	:	Gabriel Portes
-# Nome	:	restore_backup.sh
-# Data	:	03/08/2019
+# Autor :    Gabriel Portes
+# Nome  : restore_backup.sh
+# Data  : 03/08/2019
 #------------------------------------------------------------------
 
 declare -r TRUE=0
@@ -30,7 +30,7 @@ function menu
 
 function name_license()
 {
-    echo 
+    echo
     echo -n "Digite o nome da licenca: "
     read LICENCA
 }
@@ -110,7 +110,7 @@ function both_bases
 {
     prefix_vertical
     verify_base "$PREFIXAPP" && verify_base && restore_base "$PREFIXAPP" && restore_base && end || menu
-    
+
 }
 
 # $arg1 prefixo do nome da licença
@@ -127,8 +127,8 @@ function get_file_path
     if [[ $APP ]]
     then
         FILE_PATH_APP=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
-    fi    
-    
+    fi
+
     FILE_PATH_CLOUD=$(find /home/cloud-db -type f -iname "$LICENCA*.sql")
 
     FILE_PATH=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
@@ -151,7 +151,7 @@ function restore_base
 # $arg1 prefixo do nome da licença
 # return $TRUE quando a base está pronta para ser restaurada, return $FALSE quando tem algum problema
 function verify_base()
-{   
+{
     APP=$1
     clear
     get_file_path $APP
@@ -190,7 +190,7 @@ function verify_base()
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
             fi
         fi
-        
+
         if [[ ! $APP ]] # se for cloud verifica se precisa dar o update pra liberar o suporte e para alterar a url
         then
             HAS_UPDATES=$(grep "UPDATE \`USUARIO\` SET \`FL_USUARIODESATIVADO_USU\` = 0 WHERE \`ID_USUARIO_USU\` = 999998;" $FILE_PATH_CLOUD)
@@ -234,29 +234,29 @@ function get_db_from_vpn
     echo "Aguarde... Caso necessario, forneca a senha sudo para obter a licenca da VPN."
     sudo echo
 
-    #Temos cifs-utils instalado? 
-	CIFS=`dpkg  --get-selections cifs-utils 2>/dev/null`
-	if [[ "$CIFS" == "" ]]
+    #Temos cifs-utils instalado?
+    CIFS=`dpkg  --get-selections cifs-utils 2>/dev/null`
+    if [[ "$CIFS" == "" ]]
     then
-		echo "Pacote cifs-utils sera instalado..."
-		sudo apt update && sudo apt install -y cifs-utils
-	fi
+        echo "Pacote cifs-utils sera instalado..."
+        sudo apt update && sudo apt install -y cifs-utils
+    fi
     $(sudo umount /mnt/temp)
 
-	if [[ ! -d /mnt/temp ]]
+    if [[ ! -d /mnt/temp ]]
     then
-		echo "Diretorio /mnt/temp sera criado..."
-		sudo mkdir -p /mnt/temp
-	fi
+        echo "Diretorio /mnt/temp sera criado..."
+        sudo mkdir -p /mnt/temp
+    fi
 
-    
-	MOUNTED=`df | grep /mnt/temp`
-	if [[ "$MOUNTED" == "" ]]
+
+    MOUNTED=`df | grep /mnt/temp`
+    if [[ "$MOUNTED" == "" ]]
     then
-		echo "Diretorio /mnt/temp sera montado..."
-        
+        echo "Diretorio /mnt/temp sera montado..."
+
         VPN_DIR="filesystem.campinas.superlogica.com/temp/admin130430"
-		MOUNT_CIFS=$(sudo mount -t cifs -o username=guest,password= //$VPN_DIR /mnt/temp 2>&1)
+        MOUNT_CIFS=$(sudo mount -t cifs -o username=guest,password= //$VPN_DIR /mnt/temp 2>&1)
 
         if [[ "$MOUNT_CIFS" != "" ]]
         then
@@ -264,7 +264,7 @@ function get_db_from_vpn
             sleep 3
             exit
         fi
-	fi
+    fi
 
     APP=$1
     if [[ $APP ]]
@@ -274,9 +274,9 @@ function get_db_from_vpn
         BASEN=$(echo "DB_PATH" | wc -l)
         if [[ "$DB_PATH" == "" ]]
         then
-		    echo "Base $database nao localizada na VPN! Verifique..."
-		    exit
-	    fi
+            echo "Base $database nao localizada na VPN! Verifique..."
+            exit
+        fi
         cp $DB_PATH $DB_ROOT
 
         echo "Base copiada, agora extraindo..."
@@ -293,11 +293,11 @@ function get_db_from_vpn
     echo "Copiando $LICENCA para /home/cloud-db"
     DB_PATH=`find /mnt/temp/ -iname $LICENCA*gz`
     BASEN=$(echo "DB_PATH" | wc -l)
-	if [[ "$DB_PATH" == "" ]]
+    if [[ "$DB_PATH" == "" ]]
     then
-		echo "Base $database nao localizada na VPN! Verifique..."
+        echo "Base $database nao localizada na VPN! Verifique..."
         exit
-	fi
+    fi
     cp $DB_PATH $DB_ROOT
     echo "Base copiada, agora extraindo..."
     cd $DB_ROOT
