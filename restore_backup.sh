@@ -27,7 +27,7 @@ function menu
 
 function name_license()
 {
-    echo 
+    echo
     echo -n "Digite o nome da licenca: "
     read LICENCA
 }
@@ -47,7 +47,7 @@ function backup_option()
         2) only_cloud ;;
         3) both_bases ;;
         0) clear; echo -e "SAINDO DO SCRIPT..." ; sleep 2; clear; exit ;;
-        *) echo -e "Opc„o desconhecida." ; sleep 2; clear; menu ;;
+        *) echo -e "Opc√£o desconhecida." ; sleep 2; clear; menu ;;
     esac
 }
 
@@ -66,7 +66,7 @@ function prefix_vertical()
         1) PREFIXAPP="app43_" ;;
         2) PREFIXAPP="app26_" ;;
         0) clear; menu ;;
-        *) echo -e "Opc„o desconhecida." ; sleep 2; clear; menu ;;
+        *) echo -e "Opc√£o desconhecida." ; sleep 2; clear; menu ;;
     esac
 }
 
@@ -80,17 +80,15 @@ function only_app
 function only_cloud
 {
     verify_base && restore_base && end || menu
-
 }
 
 function both_bases
 {
     prefix_vertical
     verify_base "$PREFIXAPP" && verify_base && restore_base "$PREFIXAPP" && restore_base && end || menu
-    
 }
 
-# $arg1 prefixo do nome da licenÁa
+# $arg1 prefixo do nome da licen√ßa
 function get_file_path
 {
     APP=$1
@@ -98,14 +96,14 @@ function get_file_path
     if [[ $APP ]]
     then
         FILE_PATH_APP=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
-    fi    
-    
+    fi
+
     FILE_PATH_CLOUD=$(find /home/cloud-db -type f -iname "$LICENCA*.sql")
 
     FILE_PATH=$(find /home/cloud-db -type f -iname "$APP$LICENCA*.sql")
 }
 
-# $arg1 prefixo do nome da licenÁa
+# $arg1 prefixo do nome da licen√ßa
 function restore_base
 {
     APP=$1
@@ -113,16 +111,16 @@ function restore_base
     get_file_path $APP
     echo "Restaurando a base $APP$LICENCA-001..."
     echo ""
-    mysql --user=root --password=root -h 127.0.0.1 < $FILE_PATH
+    docker exec -i superlogica-mysql mysql -uroot -proot < $FILE_PATH
     echo ""
     echo "Finalizado"
     sleep 1
 }
 
-# $arg1 prefixo do nome da licenÁa
-# return $TRUE quando a base est· pronta para ser restaurada, return $FALSE quando tem algum problema
+# $arg1 prefixo do nome da licen√ßa
+# return $TRUE quando a base est√° pronta para ser restaurada, return $FALSE quando tem algum problema
 function verify_base()
-{   
+{
     APP=$1
     clear
     get_file_path $APP
@@ -143,9 +141,9 @@ function verify_base()
         LICENCA_PRODUCTION_NAME="\`$APP$LICENCA\`"
         USE_COMMAND_PRODUCTION_NAME="USE $LICENCA_PRODUCTION_NAME;"
         HAS_USE_COMMAND_PRODUCTION_NAME=$(grep "$USE_COMMAND_PRODUCTION_NAME" $FILE_PATH)
-        if [[ ! $HAS_USE_COMMAND_LOCAL_NAME ]] # n„o est· pronto para restaurar a base
+        if [[ ! $HAS_USE_COMMAND_LOCAL_NAME ]] # n√£o est√° pronto para restaurar a base
         then
-            if [[ $HAS_USE_COMMAND_PRODUCTION_NAME ]] # tem o nome da licenÁa sem o -001
+            if [[ $HAS_USE_COMMAND_PRODUCTION_NAME ]] # tem o nome da licen√ßa sem o -001
             then
                 sed -i "s/$LICENCA_PRODUCTION_NAME/$LICENCA_LOCAL_NAME/g" $FILE_PATH
             else # precisa dar o CREATE DATABASE e o USE
@@ -161,32 +159,32 @@ function verify_base()
                 sed -i "17 a $INPUT_TEXT" $FILE_PATH
             fi
         fi
-        
+
         if [[ ! $APP ]] # se for cloud verifica se precisa dar o update pra liberar o suporte e para alterar a url
         then
             HAS_UPDATES=$(grep "UPDATE \`USUARIO\` SET \`FL_USUARIODESATIVADO_USU\` = 0 WHERE \`ID_USUARIO_USU\` = 999998;" $FILE_PATH_CLOUD)
 
             if [[ ! $HAS_UPDATES ]]
             then
-                # mudar a url para acessar local quando a base t· apontada para a master HTTPS
+                # mudar a url para acessar local quando a base t√° apontada para a master HTTPS
                 UPDATE="UPDATE \`APP\` SET \`ST_URL_APP\` = REPLACE(\`ST_URL_APP\`, 'https://apps.superlogica.net/', 'http://localhost/');\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
-                # mudar a url para acessar local quando a base t· apontada para a master HTTP
+                # mudar a url para acessar local quando a base t√° apontada para a master HTTP
                 UPDATE="UPDATE \`APP\` SET \`ST_URL_APP\` = REPLACE(\`ST_URL_APP\`, 'http://apps.superlogica.net/', 'http://localhost/');\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
-                # mudar a url para acessar local quando a base est· apontada para a estagio
+                # mudar a url para acessar local quando a base est√° apontada para a estagio
                 UPDATE="UPDATE \`APP\` SET \`ST_URL_APP\` = REPLACE(\`ST_URL_APP\`, 'https://estagioapps.superlogica.net/', 'http://localhost/');\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
-                # liberar usu·rio suporte
+                # liberar usu√°rio suporte
                 UPDATE="UPDATE \`USUARIO\` SET \`FL_USUARIODESATIVADO_USU\` = 0 WHERE \`ID_USUARIO_USU\` = 999998;\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
-                # altera a senha de todos usu·rios para 'local'
+                # altera a senha de todos usu√°rios para 'local'
                 UPDATE="UPDATE \`USUARIO\` SET \`ST_AUTHTYPE_USU\` = '', \`ST_SENHA_USU\` = UPPER(MD5('local')) WHERE ID_USUARIO_USU < 999990;\n"
                 sed -i "$ a $UPDATE" $FILE_PATH_CLOUD
-                # criar novo usu·rio
+                # criar novo usu√°rio
                 INSERT="INSERT INTO \`USUARIO\` (\`ID_USUARIO_USU\`, \`ST_NOME_USU\`, \`ST_SENHA_USU\`, \`ST_APELIDO_USU\`, \`FL_USUARIODESATIVADO_USU\`, \`ST_AUTHTYPE_USU\`, \`ST_APPTOKEN_USU\`, \`ID_USUARIOQUEAUTORIZOU_USU\`, \`ST_ACCESSTOKEN_USU\`, \`FL_TIPO_USU\`, \`ST_ACESSO_USU\`, \`ST_IPSLIBERADOS_USU\`, \`ST_CPF_USU\`, \`ST_CELULAR_USU\`, \`FL_SINCRONIZARMONGO_USU\`, \`DT_ULTIMOLOGIN_USU\`) VALUES ( 888888, 'local@local.com', UPPER(MD5('local')), 'Local', 0, '', '', NULL, '', NULL, NULL, NULL, NULL, NULL, 0, NULL);\n"
                 sed -i "$ a $INSERT" $FILE_PATH_CLOUD
-                # dar acesso 1000 ao novo usu·rio
+                # dar acesso 1000 ao novo usu√°rio
                 INSERT="INSERT INTO \`ACESSO\` VALUES (1000, 888888);\n"
                 sed -i "$ a $INSERT" $FILE_PATH_CLOUD
             fi
