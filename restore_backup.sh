@@ -58,6 +58,8 @@ function prefix_vertical()
     echo -e "--------"
     echo "[ 1 ] Educacional"
     echo "[ 2 ] Imobiliarias"
+    echo "[ 3 ] App de integração assinaturas condomínios"
+    echo "[ 4 ] Sign"
     echo "[ 0 ] Voltar"
     echo
     echo -n "Digite a opcao da vertical desejada: "
@@ -65,6 +67,8 @@ function prefix_vertical()
     case $VERTICAL in
         1) PREFIXAPP="app43_" ;;
         2) PREFIXAPP="app26_" ;;
+        3) PREFIXAPP="app273_" ;;
+        4) PREFIXAPP="app54_" ;;
         0) clear; menu ;;
         *) echo -e "Opcão desconhecida." ; sleep 2; clear; menu ;;
     esac
