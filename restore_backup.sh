@@ -4,6 +4,7 @@
 # Nome              :   restore_backup.sh
 # Data criação      :   03/08/2019
 # Data atualização  :   30/12/2024
+# Como usar         :   A base que você deseja restaurar deve estar extraí­da dentro do diretório `/home/cloud-db`. Obs.: o arquivo não pode estar compactado.
 #------------------------------------------------------------------
 
 declare -r TRUE=0
